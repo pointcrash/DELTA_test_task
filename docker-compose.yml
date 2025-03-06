@@ -1,24 +1,17 @@
 services:
 
-  pg:
-    image: postgres
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
     environment:
-      POSTGRES_DB: shop
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=delivery_db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    volumes:
+      - mysql-data:/var/lib/mysql
     ports:
-      - "5432:5432"
+      - "3306:3306"
 
-  adminer:
-    image: adminer
-    ports:
-      - "8080:8080"
-
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.org
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    ports:
-      - "5050:80"
+volumes:
+  mysql-data:
