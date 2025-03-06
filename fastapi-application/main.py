@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from starlette.middleware.sessions import SessionMiddleware
 
 from core.config import settings
 
@@ -22,6 +23,12 @@ main_app = FastAPI(
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
 )
+
+main_app.add_middleware(
+    SessionMiddleware,
+    secret_key="sdfgsdg3423t635yrg354634fg34gerh46",
+)
+
 main_app.include_router(
     api_router,
 )
