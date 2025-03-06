@@ -1,14 +1,19 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from redis.asyncio import Redis
 from starlette.middleware.sessions import SessionMiddleware
 
 from core.config import settings
 
 from api import router as api_router
 from core.models import db_helper
+from utils import redis
+
+scheduler = AsyncIOScheduler()
 
 
 @asynccontextmanager
@@ -17,6 +22,7 @@ async def lifespan(app: FastAPI):
     yield
     # shutdown
     await db_helper.dispose()
+    await redis.close()
 
 
 main_app = FastAPI(
