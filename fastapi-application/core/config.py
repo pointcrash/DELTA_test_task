@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from pydantic import PostgresDsn
+from pydantic import MySQLDsn
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
@@ -21,7 +21,7 @@ class ApiPrefix(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    url: PostgresDsn
+    url: MySQLDsn
     echo: bool = False
     echo_pool: bool = False
     pool_size: int = 50
