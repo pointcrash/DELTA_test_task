@@ -24,6 +24,10 @@ async def get_all_packages(
     packages = await package_crud.get_all(
         session=session,
         session_id=session_id,
+        page=page,
+        page_size=page_size,
+        type_id=type_id,
+        has_delivery_cost=has_delivery_cost,
     )
     return packages
 

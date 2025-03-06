@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Sequence
 
 from sqlalchemy import select, and_
@@ -12,12 +13,28 @@ from core.schemas.package import PackageCreate
 async def get_all(
     session: AsyncSession,
     session_id: str,
+    page: int,
+    page_size: int,
+    type_id: int | None,
+    has_delivery_cost: bool | None,
 ) -> Sequence[Package]:
     stmt = (
         select(Package)
         .where(Package.session_id == session_id)
         .options(joinedload(Package.type))
     )
+
+    if type_id is not None:
+        stmt = stmt.where(Package.type_id == type_id)
+
+    if has_delivery_cost is not None:
+        if has_delivery_cost:
+            stmt = stmt.where(Package.delivery_cost > Decimal("0"))
+        else:
+            stmt = stmt.where(Package.delivery_cost.is_(None))
+
+    stmt = stmt.limit(page_size).offset((page - 1) * page_size)
+
     result = await session.scalars(stmt)
     return result.all()
 
