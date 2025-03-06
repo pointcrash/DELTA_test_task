@@ -13,6 +13,8 @@ class RunConfig(BaseModel):
 
 class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
+    packages: str = "/packages"
+    package_types: str = "/package_types"
 
 
 class ApiPrefix(BaseModel):

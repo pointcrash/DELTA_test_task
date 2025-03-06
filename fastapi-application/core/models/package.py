@@ -16,7 +16,7 @@ class Package(IntIdPkMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     weight: Mapped[DECIMAL] = mapped_column(DECIMAL(10, 2), nullable=False)
     content_cost: Mapped[DECIMAL] = mapped_column(DECIMAL(10, 2), nullable=False)
-    delivery_cost: Mapped[DECIMAL] = mapped_column(DECIMAL(10, 2), nullable=False)
+    delivery_cost: Mapped[DECIMAL] = mapped_column(DECIMAL(10, 2), nullable=True)
 
     type_id: Mapped[int] = mapped_column(
         ForeignKey("package_types.id"),

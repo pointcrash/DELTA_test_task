@@ -14,3 +14,6 @@ if TYPE_CHECKING:
 class PackageType(IntIdPkMixin, Base):
     name: Mapped[str] = mapped_column(String(50), unique=True)
     packages: Mapped[list["Package"]] = relationship(back_populates="type")
+
+    def __str__(self):
+        return self.name
