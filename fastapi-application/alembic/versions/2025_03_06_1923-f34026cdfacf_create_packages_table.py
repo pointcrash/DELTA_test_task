@@ -1,8 +1,8 @@
 """create packages table
 
-Revision ID: 391bdca8d298
+Revision ID: f34026cdfacf
 Revises: 88c877e88603
-Create Date: 2025-03-06 16:24:22.539462
+Create Date: 2025-03-06 19:23:07.370157
 
 """
 
@@ -12,7 +12,7 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision: str = "391bdca8d298"
+revision: str = "f34026cdfacf"
 down_revision: Union[str, None] = "88c877e88603"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,7 +25,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(length=255), nullable=False),
         sa.Column("weight", sa.DECIMAL(precision=10, scale=2), nullable=False),
         sa.Column("content_cost", sa.DECIMAL(precision=10, scale=2), nullable=False),
-        sa.Column("delivery_cost", sa.DECIMAL(precision=10, scale=2), nullable=False),
+        sa.Column("delivery_cost", sa.DECIMAL(precision=10, scale=2), nullable=True),
         sa.Column("type_id", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
