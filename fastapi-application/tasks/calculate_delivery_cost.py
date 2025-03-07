@@ -9,6 +9,7 @@ CONTENT_FACTOR = "0.01"
 
 
 async def calculate_delivery_cost():
+    """Calculate delivery cost for packages with null delivery_cost."""
     async with db_helper.session_factory() as session:
         usd_rate = await get_usd_to_rub_rate()
 

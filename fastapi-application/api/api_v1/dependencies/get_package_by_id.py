@@ -13,6 +13,7 @@ async def get_package_by_id(
     session: AsyncSession = Depends(db_helper.session_getter),
     session_id: str = Depends(get_or_set_session_id),
 ) -> Package:
+    """Dependency for getting package by id"""
     package = await package_crud.get_package_by_id(
         session=session,
         package_id=package_id,

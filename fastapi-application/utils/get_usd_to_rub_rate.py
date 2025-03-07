@@ -13,6 +13,9 @@ log = logging.getLogger(__name__)
 
 
 async def get_usd_to_rub_rate() -> Decimal:
+    """
+    Retrieve the current USD to RUB exchange rate from cache or CBR API.
+    """
     try:
         cached_rate = await redis.get(CACHE_KEY)
         if cached_rate:

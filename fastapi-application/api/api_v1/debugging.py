@@ -16,6 +16,7 @@ router = APIRouter(prefix=settings.api.v1.debug, tags=["Debug"])
     response_model=dict,
 )
 async def run_calculate_delivery_cost():
+    """Run delivery cost calculation for debugging."""
     try:
         await calculate_delivery_cost()
         log.info("Delivery cost calculation completed")

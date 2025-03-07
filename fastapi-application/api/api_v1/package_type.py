@@ -14,4 +14,5 @@ router = APIRouter(prefix=settings.api.v1.package_types, tags=["PackageType"])
 async def get_package_types(
     session: AsyncSession = Depends(db_helper.session_getter),
 ):
+    """Fetch a list of package_types."""
     return await package_type_crud.get_all(session)

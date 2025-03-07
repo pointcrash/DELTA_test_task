@@ -26,7 +26,7 @@ async def get_all_packages(
     type_id: int | None = Query(None),
     has_delivery_cost: bool | None = Query(None),
 ):
-
+    """Fetch a list of packages with pagination and filters."""
     try:
         packages = await package_crud.get_all(
             session=session,
@@ -58,6 +58,7 @@ async def create_package(
     session: AsyncSession = Depends(db_helper.session_getter),
     session_id: str = Depends(get_or_set_session_id),
 ):
+    """Create a new package."""
     try:
         package = await package_crud.create_package(
             session=session,
@@ -99,6 +100,7 @@ async def create_package(
 async def get_package(
     package: Package = Depends(get_package_by_id),
 ):
+    """Retrieve a package by ID."""
     return package
 
 
@@ -108,6 +110,7 @@ async def assign_package(
     assign_data: PackageAssign,
     session: AsyncSession = Depends(db_helper.session_getter),
 ):
+    """Assign a package to a delivery company."""
     company_id = assign_data.delivery_service_id
 
     if company_id <= 0:
