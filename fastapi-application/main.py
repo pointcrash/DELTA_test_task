@@ -31,7 +31,7 @@ main_app = FastAPI(
 
 main_app.add_middleware(
     SessionMiddleware,
-    secret_key="sdfgsdg3423t635yrg354634fg34gerh46",
+    secret_key=settings.session.secret,
 )
 
 main_app.include_router(

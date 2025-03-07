@@ -11,6 +11,10 @@ class RunConfig(BaseModel):
     port: int = 8000
 
 
+class SessionConfig(BaseModel):
+    secret: str
+
+
 class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
     packages: str = "/packages"
@@ -51,6 +55,7 @@ class Settings(BaseSettings):
     )
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
+    session: SessionConfig
     db: DatabaseConfig
     redis: RedisConfig
 
