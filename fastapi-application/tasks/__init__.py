@@ -1,3 +1,3 @@
 __all__ = ("scheduler",)
 
-from scheduler import scheduler
+from .scheduler import scheduler
