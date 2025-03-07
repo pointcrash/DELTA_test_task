@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import aiohttp
 
 from utils import redis
@@ -7,10 +9,10 @@ CACHE_KEY = "usd_to_rub_rate"
 CACHE_TTL = 3600
 
 
-async def get_usd_to_rub_rate() -> float:
+async def get_usd_to_rub_rate() -> Decimal:
     cached_rate = await redis.get(CACHE_KEY)
     if cached_rate:
-        return float(cached_rate)
+        return Decimal(cached_rate)
 
     async with aiohttp.ClientSession() as session:
         async with session.get(CBR_URL) as response:
