@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -11,6 +12,11 @@ from api import router as api_router
 from core.models import db_helper
 from tasks import scheduler
 from utils import redis
+
+logging.basicConfig(
+    level=settings.logging.log_level_value,
+    format=settings.logging.log_format,
+)
 
 
 @asynccontextmanager
