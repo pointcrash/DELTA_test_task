@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, status, Query, HTTPException
@@ -12,6 +13,8 @@ from .crud.package import assign_package_to_company
 from .dependencies import get_or_set_session_id, get_package_by_id
 
 router = APIRouter(prefix=settings.api.v1.packages, tags=["Package"])
+
+log = logging.getLogger(__name__)
 
 
 @router.get("", response_model=List[PackageRead])
@@ -36,12 +39,16 @@ async def get_all_packages(
         return packages
 
     except SQLAlchemyError as e:
+        log.error("Database error occurred", exc_info=True)
         raise HTTPException(
-            status_code=500, detail=f"Database error occurred: {str(e)}"
+            status_code=status.HTTP_status.HTTP_500_INTERNAL_SERVER_ERROR_INTERNAL_SERVER_ERROR,
+            detail="Database error occurred",
         )
     except Exception as e:
+        log.error("An unexpected error occurred", exc_info=True)
         raise HTTPException(
-            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+            status_code=status.HTTP_status.HTTP_500_INTERNAL_SERVER_ERROR_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred",
         )
 
 
@@ -63,22 +70,28 @@ async def create_package(
         await session.rollback()
         if "foreign key" in str(e).lower():
             raise HTTPException(
-                status_code=400,
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Invalid type_id: {package_create.type_id} does not exist",
             )
+        log.error("Database integrity error", exc_info=True)
         raise HTTPException(
-            status_code=500, detail=f"Database integrity error: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database integrity error",
         )
 
     except SQLAlchemyError as e:
         await session.rollback()
+        log.error("Database error occurred", exc_info=True)
         raise HTTPException(
-            status_code=500, detail=f"Database error occurred: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error occurred",
         )
     except Exception as e:
         await session.rollback()
+        log.error("An unexpected error occurred", exc_info=True)
         raise HTTPException(
-            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred",
         )
 
 
@@ -99,7 +112,8 @@ async def assign_package(
 
     if company_id <= 0:
         raise HTTPException(
-            status_code=400, detail="Transport company ID must be positive"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Transport company ID must be positive",
         )
 
     success = await assign_package_to_company(
@@ -112,5 +126,6 @@ async def assign_package(
         return {"message": f"Package {package_id} assigned to company {company_id}"}
     else:
         raise HTTPException(
-            status_code=409, detail="Package already assigned or does not exist"
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Package already assigned or does not exist",
         )
