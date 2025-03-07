@@ -23,5 +23,5 @@ async def get_package_by_id(
         return package
 
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="Посылка не найдена"
+        status_code=status.HTTP_404_NOT_FOUND, detail="Package not found"
     )
