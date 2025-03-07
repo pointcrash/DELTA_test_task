@@ -40,6 +40,7 @@ class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
     packages: str = "/packages"
     package_types: str = "/package_types"
+    debug: str = "/debug"
 
 
 class ApiPrefix(BaseModel):
