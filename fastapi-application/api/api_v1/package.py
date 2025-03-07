@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, status, Query, HTTPException
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.schemas.package import PackageRead, PackageCreate, PackageId, PackageAssign
@@ -22,15 +23,26 @@ async def get_all_packages(
     type_id: int | None = Query(None),
     has_delivery_cost: bool | None = Query(None),
 ):
-    packages = await package_crud.get_all(
-        session=session,
-        session_id=session_id,
-        page=page,
-        page_size=page_size,
-        type_id=type_id,
-        has_delivery_cost=has_delivery_cost,
-    )
-    return packages
+
+    try:
+        packages = await package_crud.get_all(
+            session=session,
+            session_id=session_id,
+            page=page,
+            page_size=page_size,
+            type_id=type_id,
+            has_delivery_cost=has_delivery_cost,
+        )
+        return packages
+
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=500, detail=f"Database error occurred: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        )
 
 
 @router.post("", response_model=PackageId, status_code=status.HTTP_201_CREATED)
@@ -39,12 +51,35 @@ async def create_package(
     session: AsyncSession = Depends(db_helper.session_getter),
     session_id: str = Depends(get_or_set_session_id),
 ):
-    package = await package_crud.create_package(
-        session=session,
-        package_create=package_create,
-        session_id=session_id,
-    )
-    return package
+    try:
+        package = await package_crud.create_package(
+            session=session,
+            package_create=package_create,
+            session_id=session_id,
+        )
+        return package
+
+    except IntegrityError as e:
+        await session.rollback()
+        if "foreign key" in str(e).lower():
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid type_id: {package_create.type_id} does not exist",
+            )
+        raise HTTPException(
+            status_code=500, detail=f"Database integrity error: {str(e)}"
+        )
+
+    except SQLAlchemyError as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=500, detail=f"Database error occurred: {str(e)}"
+        )
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        )
 
 
 @router.get("/{package_id}", response_model=PackageRead)

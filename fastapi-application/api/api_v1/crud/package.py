@@ -67,12 +67,8 @@ async def create_package(
         session_id=session_id,
     )
     session.add(package)
-    try:
-        await session.commit()
-        return package
-    except IntegrityError:
-        await session.rollback()
-        raise
+    await session.commit()
+    return package
 
 
 async def assign_package_to_company(

@@ -2,6 +2,7 @@ from pydantic import (
     BaseModel,
     field_serializer,
     field_validator,
+    Field,
 )
 from decimal import Decimal
 
@@ -18,8 +19,8 @@ class PackageAssign(BaseModel):
 
 class PackageBase(BaseModel):
     name: str
-    weight: Decimal
-    content_cost: Decimal
+    weight: Decimal = Field(gt=0)
+    content_cost: Decimal = Field(gt=0)
 
     class Config:
         json_encoders = {Decimal: lambda v: str(v)}
