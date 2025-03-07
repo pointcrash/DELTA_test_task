@@ -13,9 +13,14 @@ log = logging.getLogger(__name__)
 
 
 async def get_usd_to_rub_rate() -> Decimal:
-    cached_rate = await redis.get(CACHE_KEY)
-    if cached_rate:
-        rate = Decimal(cached_rate)
+    try:
+        cached_rate = await redis.get(CACHE_KEY)
+        if cached_rate:
+            rate = Decimal(cached_rate)
+
+    except Exception:
+        log.error("Connection Redis error", exc_info=True)
+        raise Exception("Connection Redis error")
 
     else:
         try:
@@ -27,7 +32,7 @@ async def get_usd_to_rub_rate() -> Decimal:
                     rate = Decimal(rate)
 
         except Exception as e:
-            log.error(f"Ошибка получения курса: {str(e)}", exc_info=True)
-            raise Exception(f"Не удалось получить курс USD/RUB: {str(e)}")
+            log.error("Error getting rate", exc_info=True)
+            raise Exception("Error getting rate")
 
     return rate
