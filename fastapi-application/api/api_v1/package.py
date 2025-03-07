@@ -1,12 +1,13 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, status, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.schemas.package import PackageRead, PackageCreate, PackageId
+from core.schemas.package import PackageRead, PackageCreate, PackageId, PackageAssign
 from .crud import package as package_crud
 from core.config import settings
 from core.models import db_helper, Package
+from .crud.package import assign_package_to_company
 from .dependencies import get_or_set_session_id, get_package_by_id
 
 router = APIRouter(prefix=settings.api.v1.packages, tags=["Package"])
@@ -51,3 +52,30 @@ async def get_package(
     package: Package = Depends(get_package_by_id),
 ):
     return package
+
+
+@router.post("/{package_id}/assign", response_model=dict)
+async def assign_package(
+    package_id: int,
+    assign_data: PackageAssign,
+    session: AsyncSession = Depends(db_helper.session_getter),
+):
+    company_id = assign_data.delivery_service_id
+
+    if company_id <= 0:
+        raise HTTPException(
+            status_code=400, detail="Transport company ID must be positive"
+        )
+
+    success = await assign_package_to_company(
+        package_id,
+        company_id,
+        session,
+    )
+
+    if success:
+        return {"message": f"Package {package_id} assigned to company {company_id}"}
+    else:
+        raise HTTPException(
+            status_code=409, detail="Package already assigned or does not exist"
+        )

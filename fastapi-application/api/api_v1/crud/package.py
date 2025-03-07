@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Sequence
 
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -73,3 +73,19 @@ async def create_package(
     except IntegrityError:
         await session.rollback()
         raise
+
+
+async def assign_package_to_company(
+    package_id: int,
+    company_id: int,
+    session: AsyncSession,
+) -> bool:
+    stmt = (
+        update(Package)
+        .where(Package.id == package_id)
+        .where(Package.delivery_service_id.is_(None))
+        .values(delivery_service_id=company_id)
+    )
+    result = await session.execute(stmt)
+    await session.commit()
+    return result.rowcount > 0

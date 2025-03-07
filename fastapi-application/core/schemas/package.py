@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_serializer, computed_field
+from pydantic import BaseModel, field_serializer, computed_field, model_serializer
 from decimal import Decimal
 
 from core.schemas.package_type import PackageTypeBase
@@ -6,6 +6,10 @@ from core.schemas.package_type import PackageTypeBase
 
 class PackageId(BaseModel):
     id: int
+
+
+class PackageAssign(BaseModel):
+    delivery_service_id: int
 
 
 class PackageBase(BaseModel):
@@ -22,15 +26,10 @@ class PackageCreate(PackageBase):
 
 
 class PackageRead(PackageBase):
+    id: int
     delivery_cost: Decimal | None
     type: PackageTypeBase
-
-    @computed_field(return_type=str)
-    @property
-    def delivery_cost_display(self) -> str:
-        return (
-            "Не рассчитано" if self.delivery_cost is None else str(self.delivery_cost)
-        )
+    delivery_service_id: int | None
 
     @field_serializer("type")
     def serialize_type(self, value: PackageTypeBase) -> str:
