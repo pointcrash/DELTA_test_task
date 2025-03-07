@@ -9,7 +9,6 @@ from core.schemas.package import PackageRead, PackageCreate, PackageId, PackageA
 from .crud import package as package_crud
 from core.config import settings
 from core.models import db_helper, Package
-from .crud.package import assign_package_to_company
 from .dependencies import get_or_set_session_id, get_package_by_id
 
 router = APIRouter(prefix=settings.api.v1.packages, tags=["Package"])
@@ -119,7 +118,7 @@ async def assign_package(
             detail="Transport company ID must be positive",
         )
 
-    success = await assign_package_to_company(
+    success = await package_crud.assign_package_to_company(
         package_id,
         company_id,
         session,
