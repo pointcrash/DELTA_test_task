@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Literal
 from pydantic import BaseModel
 from pydantic import MySQLDsn, RedisDsn
@@ -6,6 +7,8 @@ from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
 )
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 LOG_DEFAULT_FORMAT = (
     "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
@@ -27,9 +30,16 @@ class LoggingConfig(BaseModel):
         return logging.getLevelNamesMapping()[self.log_level.upper()]
 
 
-class RunConfig(BaseModel):
+class UvicornRunConfig(BaseModel):
     host: str = "0.0.0.0"
     port: int = 8000
+
+
+class GunicornRunConfig(BaseModel):
+    host: str = "0.0.0.0"
+    port: int = 8000
+    workers: int = 1
+    timeout: int = 900
 
 
 class SessionConfig(BaseModel):
@@ -70,14 +80,18 @@ class RedisConfig(BaseModel):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(".env.template", ".env"),
+        env_file=(
+            BASE_DIR / ".env.template",
+            BASE_DIR / ".env",
+        ),
         case_sensitive=False,
         env_nested_delimiter="__",
         env_prefix="APP_CONFIG__",
     )
-    run: RunConfig = RunConfig()
+    run: UvicornRunConfig = UvicornRunConfig()
     api: ApiPrefix = ApiPrefix()
     logging: LoggingConfig = LoggingConfig()
+    gunicorn: GunicornRunConfig = GunicornRunConfig()
     session: SessionConfig
     db: DatabaseConfig
     redis: RedisConfig
